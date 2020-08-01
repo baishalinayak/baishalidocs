@@ -10,7 +10,7 @@ public class TransactionDetails {
 	private Date transactionDate;
 	private String toUsername;
 	private String fromUsername;
-	private Integer amount;
+	private Double amount;
 	private String transactionstatus;
 	
 	
@@ -40,10 +40,10 @@ public class TransactionDetails {
 	public void setFromUsername(String fromUsername) {
 		this.fromUsername = fromUsername;
 	}
-	public Integer getAmount() {
+	public Double getAmount() {
 		return amount;
 	}
-	public void setAmount(Integer amount) {
+	public void setAmount(Double amount) {
 		this.amount = amount;
 	}
 	public String getTransactionstatus() {

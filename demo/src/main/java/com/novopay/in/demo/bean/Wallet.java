@@ -3,7 +3,7 @@ package com.novopay.in.demo.bean;
 public class Wallet {
 	
 	private Integer walletId;
-	private Integer balance;
+	private  Double  balance;
 	
 	public Integer getWalletId() {
 		return walletId;
@@ -11,10 +11,10 @@ public class Wallet {
 	public void setWalletId(Integer walletId) {
 		this.walletId = walletId;
 	}
-	public Integer getBalance() {
+	public Double getBalance() {
 		return balance;
 	}
-	public void setBalance(Integer balance) {
+	public void setBalance(Double balance) {
 		this.balance = balance;
 	}
 	

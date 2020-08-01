@@ -28,7 +28,7 @@ public class TransactionEntity {
 	@Column
 	private String fromUsername;
 	@Column
-	private Integer amount;
+	private Double amount;
 	@Column
 	private String transactionstatus;
 	
@@ -58,10 +58,10 @@ public class TransactionEntity {
 	public void setFromUsername(String fromUsername) {
 		this.fromUsername = fromUsername;
 	}
-	public Integer getAmount() {
+	public Double getAmount() {
 		return amount;
 	}
-	public void setAmount(Integer amount) {
+	public void setAmount(Double amount) {
 		this.amount = amount;
 	}
 	public String getTransactionstatus() {

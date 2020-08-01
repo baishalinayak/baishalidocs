@@ -28,7 +28,7 @@ public class WalletEntity {
 	
 	
 	@Column
-	private Integer balance;
+	private Double balance;
 
 
 	public UserEntity getUser() {
@@ -51,12 +51,12 @@ public class WalletEntity {
 	}
 
 
-	public Integer getBalance() {
+	public Double getBalance() {
 		return balance;
 	}
 
 
-	public void setBalance(Integer balance) {
+	public void setBalance(Double balance) {
 		this.balance = balance;
 	}
 	

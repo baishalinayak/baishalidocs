@@ -35,7 +35,7 @@ public class UserAuthenticationRepositoryImpl implements UserAuthenticationRepos
 		try {
 
 			WalletEntity wallet = new WalletEntity();
-			wallet.setBalance(0);
+			wallet.setBalance(0d);
 
 			UserEntity userEntity = new UserEntity();
 			userEntity.setUserName(user.getUserName());
