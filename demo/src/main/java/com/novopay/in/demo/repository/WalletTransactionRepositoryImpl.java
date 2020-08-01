@@ -1,5 +1,8 @@
 package com.novopay.in.demo.repository;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 
@@ -11,55 +14,49 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.novopay.in.demo.bean.TransactionDetails;
-import com.novopay.in.demo.bean.User;
 import com.novopay.in.demo.dto.TransactionEntity;
 import com.novopay.in.demo.dto.WalletEntity;
 
 @Repository
 public class WalletTransactionRepositoryImpl implements WalletTransactionRepository {
-	
-	private static final String ADDMONEYSUCCESSMSG="Money added successfully";
-	private static final String TRANSACTIONSUCCESSMSG="Transaction added successfully";
-	
-	
+
+	private static final String ADDMONEYSUCCESSMSG = "Money added successfully";
+	private static final String TRANSACTIONSUCCESSMSG = "Transaction added successfully";
+
 	@Autowired
 	private SessionFactory sessionFactory;
-	
-	public Integer getWalletId(User user) {
+
+	public Integer getWalletId(String user) {
 		Session session = sessionFactory.openSession();
-		Integer walletId=0;
+		Integer walletId = 0;
 		try {
 			String sql = "select WALLETID from USER where USERNAME = ?";
 			Query query = session.createNativeQuery(sql);
-			query.setParameter(1, user.getUserName());
-			 walletId = (Integer)query.getSingleResult();
-
+			query.setParameter(1, user);
+			walletId = (Integer) query.getSingleResult();
+			
 		} catch (PersistenceException exception) {
 
-			throw new PersistenceException();
-		} catch (Exception ex) {
-
+			throw exception;
 		} finally {
 			session.close();
 		}
 
 		return walletId;
 	}
-	
-	public Integer getBalance(Integer walletId) {
+
+	public Double getBalance(Integer walletId) {
 		Session session = sessionFactory.openSession();
-		Integer balance=0;
+
+		Double balance = 0d;
 		try {
 			String sql = "select we.balance from WalletEntity we where we.walletId = :walletId";
 			Query query = session.createQuery(sql);
 			query.setParameter("walletId", walletId);
-			balance = (Integer)query.getSingleResult();
-			session.getTransaction().commit();
+			balance = (Double) query.getSingleResult();
+			
 		} catch (PersistenceException exception) {
-			exception.printStackTrace();
-			throw new PersistenceException();
-		} catch (Exception ex) {
-
+			throw exception;
 		} finally {
 			session.close();
 		}
@@ -68,60 +65,140 @@ public class WalletTransactionRepositoryImpl implements WalletTransactionReposit
 	}
 
 	@Transactional
-	public String addMoney( User user,Integer money,Integer walletId) {
+	public String addMoney(Double money, Integer walletId) {
 
 		Session session = sessionFactory.openSession();
-		Transaction tx=session.beginTransaction();
-		String message="";
+		Transaction tx = session.beginTransaction();
+		String message = "";
 		try {
-			
-			WalletEntity wallet=new WalletEntity();
+
+			WalletEntity wallet = new WalletEntity();
 			wallet.setWalletId(walletId);
 			wallet.setBalance(money);
 			session.update(wallet);
-			message=ADDMONEYSUCCESSMSG;
+			message = ADDMONEYSUCCESSMSG;
 			tx.commit();
-			
-		} catch (PersistenceException exception) {
 
-			throw new PersistenceException();
-		} catch (Exception ex) {
+		} catch (PersistenceException exception) {
+			throw exception;
 
 		} finally {
+
 			session.close();
 		}
 
 		return message;
 
 	}
-	
+
+	public String addErrormessage() {
+		return "some error occured";
+	}
+
 	@Transactional
 	public String saveTransactionDetails(TransactionDetails transactionDetails) {
-		
+
 		Session session = sessionFactory.openSession();
-		Transaction tx=session.beginTransaction();
-		String message="";
+		Transaction tx = session.beginTransaction();
+		String message = "";
 		try {
-			
-			TransactionEntity trans=new TransactionEntity();
+
+			TransactionEntity trans = new TransactionEntity();
 			trans.setAmount(transactionDetails.getAmount());
 			trans.setToUsername(transactionDetails.getToUsername());
 			trans.setFromUsername(transactionDetails.getFromUsername());
 			trans.setTransactionDate(transactionDetails.getTransactionDate());
 			trans.setTransactionstatus(transactionDetails.getTransactionstatus());
 			session.save(trans);
-			message=TRANSACTIONSUCCESSMSG;
+			message = TRANSACTIONSUCCESSMSG;
 			tx.commit();
-			
+
 		} catch (PersistenceException exception) {
 
-			throw new PersistenceException();
+			throw exception;
 		} catch (Exception ex) {
 
 		} finally {
 			session.close();
 		}
 		return message;
+	}
+
+	public List<TransactionDetails> getTransactionDetails(String userName) {
+		Session session = sessionFactory.openSession();
+		List<TransactionDetails> transactionDetailslist = new ArrayList();
+
+		try {
+			String sql = " from TransactionEntity we where we.fromUsername = :userName or we.toUsername = :userName";
+			Query query = session.createQuery(sql);
+			query.setParameter("userName", userName);
+			List<TransactionEntity> list = query.getResultList();
+			for (TransactionEntity transactionEntity : list) {
+				TransactionDetails transactionDetails = new TransactionDetails();
+				transactionDetails.setTransactionId(transactionDetails.getTransactionId());
+				transactionDetails.setAmount(transactionEntity.getAmount());
+				transactionDetails.setToUsername(transactionEntity.getToUsername());
+				transactionDetails.setFromUsername(transactionDetails.getFromUsername());
+				transactionDetails.setTransactionDate(transactionDetails.getTransactionDate());
+				transactionDetails.setTransactionstatus(transactionDetails.getTransactionstatus());
+				transactionDetailslist.add(transactionDetails);
+			}
+			
+		} catch (PersistenceException exception) {
+			throw exception;
+		} finally {
+			session.close();
+		}
+
+		return transactionDetailslist;
+	}
+	
+	public String statusInquiry(Integer TransactionId) {
+		Session session = sessionFactory.openSession();
+		String status = "";
+		try {
+			String sql = "select te.transactionstatus from  TransactionEntity te where te.transactionId =: TransactionId";
+			Query query = session.createQuery(sql);
+			query.setParameter("TransactionId", TransactionId);
+			status = (String) query.getSingleResult();
+			
+		} catch (PersistenceException exception) {
+
+			throw exception;
+		} finally {
+			session.close();
+		}
+
+		return status;
+	}
+	
+	public TransactionDetails transactionReversal(Integer TransactionId) {
+		
+		Session session = sessionFactory.openSession();
+		TransactionDetails transactionDetails=new TransactionDetails();
+		try {
+			String sql = "select te.toUsername , te.fromUsername , te.amount from  TransactionEntity te where te.transactionId =: TransactionId";
+			Query query = session.createQuery(sql);
+			query.setParameter("TransactionId", TransactionId);
+			List<Object[]> list = query.getResultList();
+			
+			for(Object[] transactionEntity:list) {
+				
+				transactionDetails.setToUsername((String)transactionEntity[0]);
+				transactionDetails.setFromUsername((String)transactionEntity[1]);
+				transactionDetails.setAmount((Double)transactionEntity[2]);
+				
+			}
+			
+		} catch (PersistenceException exception) {
+			
+			throw exception;
+		} finally {
+			session.close();
+		}
+
+		return transactionDetails;
+		
 	}
 
 }
