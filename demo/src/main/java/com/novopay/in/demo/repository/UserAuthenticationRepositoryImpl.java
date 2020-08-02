@@ -8,6 +8,8 @@ import javax.persistence.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,14 +22,22 @@ import com.novopay.in.demo.dto.WalletEntity;
 @Repository
 public class UserAuthenticationRepositoryImpl implements UserAuthenticationRepository {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(UserAuthenticationRepository.class);
+
 	@Autowired
 	private SessionFactory sessionFactory;
 
 	@Autowired
 	EncryptionDecryption encryptionDecryption;
 
+	private static final String LOGINSUCCESSMSG = "Login Successful";
+	private static final String USERNOTFOUNDMSG = "User not found";
+	private static final String LOGINERRORMSG = "Incorrect username or password";
+	private static final String SIGNUPSUCCESSMSG = "user has been added successfully";
+
 	@Transactional
 	public String signUp(User user) {
+		LOGGER.info("Inside signup method");
 
 		Session session = sessionFactory.openSession();
 		Transaction tx = session.beginTransaction();
@@ -48,6 +58,8 @@ public class UserAuthenticationRepositoryImpl implements UserAuthenticationRepos
 			userEntity.setWallet(wallet);
 			session.saveOrUpdate(userEntity);
 
+			LOGGER.debug("the user is : {}", userEntity.getUserName());
+
 		} catch (PersistenceException exception) {
 
 			throw new PersistenceException();
@@ -58,12 +70,13 @@ public class UserAuthenticationRepositoryImpl implements UserAuthenticationRepos
 			session.close();
 		}
 
-		return "user has been added successfully";
+		return SIGNUPSUCCESSMSG;
 	}
 
 	public String signIn(User user) {
+		LOGGER.info("Inside signIn method");
 		String password = "";
-		String message = "Incorrect username or password";
+		String message = LOGINERRORMSG;
 		Session session = sessionFactory.openSession();
 		try {
 			String sql = "from UserEntity ue where ue.userName = :username";
@@ -71,7 +84,7 @@ public class UserAuthenticationRepositoryImpl implements UserAuthenticationRepos
 			query.setParameter("username", user.getUserName());
 			List<UserEntity> userEntityList = query.getResultList();
 			if (userEntityList.isEmpty() || userEntityList == null || userEntityList.size() == 0)
-				message = "User not found";
+				message = USERNOTFOUNDMSG;
 
 			for (UserEntity userEntity : userEntityList) {
 				password = encryptionDecryption.decryptedText(userEntity.getPassword());
@@ -79,8 +92,10 @@ public class UserAuthenticationRepositoryImpl implements UserAuthenticationRepos
 			}
 
 			if (password.equals(user.getPassword())) {
-				message = "Login Successful";
+				message = LOGINSUCCESSMSG;
 			}
+
+			LOGGER.debug("the message : {}", message);
 
 		} catch (PersistenceException exception) {
 

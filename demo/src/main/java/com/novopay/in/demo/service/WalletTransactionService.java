@@ -13,7 +13,7 @@ public interface WalletTransactionService {
 	
 	public String addMoney( User user,Double amount);
 	public String transferMoney(User user,String recievingUser,Double amount,String chargingEnd);
-	public String statusInquiry(Integer TransactionId);
+	public String statusInquiry(Integer transactionId);
 	public List<TransactionDetails> getTransactionDetails(User user);
 	public String transactionReversal(Integer TransactionId);
 	

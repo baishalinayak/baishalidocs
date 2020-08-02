@@ -43,6 +43,8 @@ public class HibernateConfiguration {
 
 	@Value("${hibernate.jdbc.batch_size}")
 	private String batchSize;
+	
+	
 
 	@Bean
 	public DataSource dataSource() {
@@ -68,6 +70,7 @@ public class HibernateConfiguration {
 		hibernateProperties.put("hibernate.show_sql", showsql);
 		hibernateProperties.put("hibernate.hbm2ddl.auto", hbm2autoddl);
 		hibernateProperties.put("hibernate.jdbc.batch_size", batchSize);
+		
 		sessionFactory.setHibernateProperties(hibernateProperties);
 		return sessionFactory;
 

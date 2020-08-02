@@ -1,41 +1,32 @@
 package com.novopay.in.demo;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.PropertySource;
 
-import com.novopay.in.demo.bean.User;
-import com.novopay.in.demo.service.UserAuthenticationService;
-import com.novopay.in.demo.service.WalletTransactionService;
+@PropertySource("classpath:application.properties")
 
-@SpringBootApplication
-public class DemoApplication implements CommandLineRunner{
+@SpringBootApplication(scanBasePackages = {"com.novopay"})
+public class DemoApplication implements CommandLineRunner {
 	
-	@Autowired
-	UserAuthenticationService signInSignUpService;
+	private  static final  Logger LOGGER=LoggerFactory.getLogger(DemoApplication.class);
 	
-	@Autowired
-	WalletTransactionService walletTransactionService;
+	
 
 	public static void main(String[] args) {
 		
 		SpringApplication.run(DemoApplication.class, args);
 	}
+	
+	
 
 	public void run(String... args) throws Exception {
 		
-		User user=new User();
-		user.setPassword("Baishali");
-		user.setUserName("Baishali6");
-		//user.setFirstName("Baishali123");
-		//user.setLastName("nayak123");
-		//user.setPhoneNumber(1234567891);
+		LOGGER.info("application is running ");
 		
-		//signInSignUpService.signIn(user);
-		walletTransactionService.addMoney(user, 100);
-		
-		// TODO Auto-generated method stub
 		
 	}
 
